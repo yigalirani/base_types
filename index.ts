@@ -1,0 +1,1 @@
+export type s2t<T> = Record<string, T>
