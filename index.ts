@@ -50,3 +50,7 @@ export function has_keys(obj: unknown, keys: string[]): boolean {
   for (const k of keys) if (k in keys) return true
   return false
 }
+export type strset = Set<string>
+export type s2num = Record<string, number>
+export type s2s = Record<string, string>
+export type num2num = Record<number, number>
