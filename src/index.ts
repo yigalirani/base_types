@@ -31,9 +31,8 @@ export function get_error(x:unknown){
   return new Error(str)
 }
 export function is_object<T extends object=s2u>(value: unknown): value is T{
-  if (value == null) return false
-  const the_type = typeof value
-  return the_type === 'object' || the_type === 'function'
+  return value != null &&typeof value === 'object' && value.constructor === Object;
+
 }
 export function has_key(obj: unknown, k: string): boolean {
   if (!is_object(obj)) return false

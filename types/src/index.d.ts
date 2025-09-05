@@ -1,0 +1,18 @@
+export type s2t<T> = Record<string, T>;
+export type s2u = Record<string, unknown>;
+export type p2u = Record<PropertyKey, unknown>;
+export declare function nl<T>(value: T | null | undefined): T;
+export type Key = number | string;
+export type Atom = number | string | boolean;
+export declare function is_atom(x: unknown): x is Atom;
+export declare function is_key(x: unknown): x is Key;
+export declare function is_atom_ex(v: unknown, place: string, k?: string): v is Atom;
+export declare function get_error(x: unknown): Error;
+export declare function is_object<T extends object = s2u>(value: unknown): value is T;
+export declare function has_key(obj: unknown, k: string): boolean;
+export declare function objects_only(ar: unknown[]): Generator<s2u, void, unknown>;
+export declare function has_keys(obj: unknown, keys: string[]): boolean;
+export type strset = Set<string>;
+export type s2num = Record<string, number>;
+export type s2s = Record<string, string>;
+export type num2num = Record<number, number>;

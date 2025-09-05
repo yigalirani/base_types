@@ -1,0 +1,43 @@
+{
+  // See https://go.microsoft.com/fwlink/?LinkId=733558
+  // for the documentation about the tasks.json format
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "tsc",
+      "type": "shell",
+      "command": "npm run watch_tsc",
+    },  
+    {
+      "label":"build",
+      "type":"shell",
+      "command":"npm run   watch_build",
+    },
+    {
+      "label": "eslint",
+      "type": "shell",
+      "command": "npm run run_eslint",
+    },   
+    {
+      "label": "biome",
+      "type": "shell",
+      "command": "npm run run_biome",
+    },            
+    {
+      "label": "test",
+      "type": "shell",
+      "command": "npm run test",
+    },      
+    {
+      "label": "runall",
+      "dependsOn": [
+        "tsc",
+        "eslint",
+        "biome",
+        "test",
+	"build"
+      ]
+
+    }    
+  ]
+}

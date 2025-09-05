@@ -1,0 +1,51 @@
+{
+  "files": {
+    "includes": [
+      "*.ts",
+      "!**/dist",
+      "!types",
+      "src/*.ts"
+    ]
+  },
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "off"
+      }
+    }
+  },
+  "json": {
+    "linter": {
+      "enabled": false
+    }
+  },
+  "linter": {
+    "rules": {
+      "performance":"on",
+      "performance": {
+        "noNamespaceImport": "off"
+      },
+      "nursery": "warn",
+      "nursery":{
+        "useExplicitType":"off",
+        "useMaxParams":"warn"
+      },
+      "suspicious": "on",
+      "suspicious": {
+        "noConsole":"off",
+        "noConfusingVoidType":"off"
+      },
+      "complexity": "on",
+      "complexity": {
+        "useArrowFunction": "off",
+        "useOptionalChain": "off",
+        "noExcessiveCognitiveComplexity": "off"
+      },
+      "style":"on",
+      "style": {
+        "noNonNullAssertion": "off",
+        "useTemplate": "off"
+      }
+    }
+  }
+}
