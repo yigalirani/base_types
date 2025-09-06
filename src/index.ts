@@ -31,15 +31,15 @@ export function get_error(x:unknown){
   return new Error(str)
 }
 export function is_object<T extends object=s2u>(value: unknown): value is T{
-  if (value == null || typeof value !== 'object') return false;
+  if (value == null) return false;
+  
+  // Accept objects and functions
+  if (typeof value !== 'object' && typeof value !== 'function') return false;
   
   // Exclude known non-object types
   if (Array.isArray(value)) return false;
-  if (value instanceof Date) return false;
-  if (value instanceof RegExp) return false;
   if (value instanceof Set) return false;
   if (value instanceof Map) return false;
-  if (value instanceof Function) return false;
   
   return true;
 }

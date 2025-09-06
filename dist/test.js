@@ -26,13 +26,11 @@ module.exports = __toCommonJS(test_exports);
 
 // src/index.ts
 function is_object(value) {
-  if (value == null || typeof value !== "object") return false;
+  if (value == null) return false;
+  if (typeof value !== "object" && typeof value !== "function") return false;
   if (Array.isArray(value)) return false;
-  if (value instanceof Date) return false;
-  if (value instanceof RegExp) return false;
   if (value instanceof Set) return false;
   if (value instanceof Map) return false;
-  if (value instanceof Function) return false;
   return true;
 }
 
@@ -42,6 +40,17 @@ var Hello = class {
     console.log("making Hello");
   }
 };
+function createSimplePromise(shouldSucceed) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (shouldSucceed) {
+        resolve("Operation successful!");
+      } else {
+        reject(new Error("Operation failed!"));
+      }
+    }, 1e3);
+  });
+}
 function runTests() {
   let passed = 0;
   let failed = 0;
@@ -57,7 +66,7 @@ function runTests() {
   console.log("Running is_object tests...\n");
   test("class instance should return true", is_object(new Hello()));
   test("Set should return false", !is_object(/* @__PURE__ */ new Set()));
-  test("Function should return false", !is_object(() => {
+  test("Function should return true", is_object(() => {
   }));
   test("Array should return false", !is_object([1, 2, 3]));
   test("Number atom should return false", !is_object(42));
@@ -65,9 +74,10 @@ function runTests() {
   test("Boolean atom should return false", !is_object(true));
   test("null should return false", !is_object(null));
   test("undefined should return false", !is_object(void 0));
-  test("Date should return false", !is_object(/* @__PURE__ */ new Date()));
-  test("RegExp should return false", !is_object(/test/));
+  test("Date should return true", is_object(/* @__PURE__ */ new Date()));
+  test("RegExp should return true", is_object(/test/));
   test("Map should return false", !is_object(/* @__PURE__ */ new Map()));
+  test("Promise should return True", is_object(createSimplePromise(true)));
   test("Plain object should return true", is_object({}));
   test("Plain object with properties should return true", is_object({ a: 1, b: "test" }));
   test("Object created with Object.create should return true", is_object(/* @__PURE__ */ Object.create({})));

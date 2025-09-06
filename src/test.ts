@@ -4,7 +4,18 @@ class Hello{
     console.log('making Hello')
   }
 }
-
+function createSimplePromise(shouldSucceed: boolean): Promise<string> {
+  return new Promise((resolve, reject) => {
+    // Simulate an asynchronous operation, e.g., a network request or a timer
+    setTimeout(() => {
+      if (shouldSucceed) {
+        resolve("Operation successful!"); // Resolve the promise with a success value
+      } else {
+        reject(new Error("Operation failed!")); // Reject the promise with an error
+      }
+    }, 1000); // Simulate a 1-second delay
+  });
+}
 // Test function to run all tests
 export function runTests() {
   let passed = 0
@@ -25,17 +36,17 @@ export function runTests() {
   // Test cases that should return false
   test('class instance should return true', is_object(new Hello()))
   test('Set should return false', !is_object(new Set()))
-  test('Function should return false', !is_object(() => {}))
+  test('Function should return true', is_object(() => {}))
   test('Array should return false', !is_object([1, 2, 3]))
   test('Number atom should return false', !is_object(42))
   test('String atom should return false', !is_object('hello'))
   test('Boolean atom should return false', !is_object(true))
   test('null should return false', !is_object(null))
   test('undefined should return false', !is_object(undefined))
-  test('Date should return false', !is_object(new Date()))
-  test('RegExp should return false', !is_object(/test/))
+  test('Date should return true', is_object(new Date()))
+  test('RegExp should return true', is_object(/test/))
   test('Map should return false', !is_object(new Map()))
-
+  test('Promise should return True', is_object(createSimplePromise(true)))
   // Test cases that should return true
   test('Plain object should return true', is_object({}))
   test('Plain object with properties should return true', is_object({ a: 1, b: 'test' }))
