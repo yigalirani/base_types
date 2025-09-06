@@ -1,4 +1,9 @@
 import { is_object } from './index'
+class Hello{
+  constructor(){
+    console.log('making Hello')
+  }
+}
 
 // Test function to run all tests
 export function runTests() {
@@ -15,10 +20,10 @@ export function runTests() {
       failed++
     }
   }
-
   console.log('Running is_object tests...\n')
 
   // Test cases that should return false
+  test('class instance should return true', is_object(new Hello()))
   test('Set should return false', !is_object(new Set()))
   test('Function should return false', !is_object(() => {}))
   test('Array should return false', !is_object([1, 2, 3]))

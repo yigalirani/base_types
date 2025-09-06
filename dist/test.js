@@ -30,6 +30,11 @@ function is_object(value) {
 }
 
 // src/test.ts
+var Hello = class {
+  constructor() {
+    console.log("making Hello");
+  }
+};
 function runTests() {
   let passed = 0;
   let failed = 0;
@@ -43,6 +48,7 @@ function runTests() {
     }
   }
   console.log("Running is_object tests...\n");
+  test("class instance should return true", is_object(new Hello()));
   test("Set should return false", !is_object(/* @__PURE__ */ new Set()));
   test("Function should return false", !is_object(() => {
   }));
