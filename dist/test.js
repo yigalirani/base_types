@@ -33,6 +33,13 @@ function is_object(value) {
   if (value instanceof Map) return false;
   return true;
 }
+function pk(obj, ...keys) {
+  const ret = {};
+  keys.forEach((key) => {
+    ret[key] = obj == null ? void 0 : obj[key];
+  });
+  return ret;
+}
 
 // src/test.ts
 var Hello = class {
@@ -81,6 +88,17 @@ function runTests() {
   test("Plain object should return true", is_object({}));
   test("Plain object with properties should return true", is_object({ a: 1, b: "test" }));
   test("Object created with Object.create should return true", is_object(/* @__PURE__ */ Object.create({})));
+  console.log("\nRunning pk tests...\n");
+  const user = { id: 7, name: "Ada", active: true };
+  const pickId = pk(user, "id");
+  test("pk picks single key", pickId.id === 7);
+  const pickTwo = pk(user, "id", "name");
+  test("pk picks multiple keys", pickTwo.id === 7 && pickTwo.name === "Ada");
+  const userOpt = { id: 1 };
+  const pickOptional = pk(userOpt, "name");
+  test("pk returns undefined for missing optional key", pickOptional.name === void 0);
+  const pickFromUndefined = pk(void 0, "id", "name");
+  test("pk works with undefined source, values undefined", pickFromUndefined.id === void 0 && pickFromUndefined.name === void 0);
   console.log(`
 Test Results: ${passed} passed, ${failed} failed`);
   if (failed === 0) {

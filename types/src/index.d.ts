@@ -16,3 +16,4 @@ export type strset = Set<string>;
 export type s2num = Record<string, number>;
 export type s2s = Record<string, string>;
 export type num2num = Record<number, number>;
+export declare function pk<T, K extends keyof T>(obj: T | undefined, ...keys: K[]): Pick<T, K>;

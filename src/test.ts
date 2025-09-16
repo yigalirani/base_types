@@ -1,4 +1,4 @@
-import { is_object } from './index'
+import { is_object, pk } from './index'
 class Hello{
   constructor(){
     console.log('making Hello')
@@ -52,6 +52,23 @@ export function runTests() {
   test('Plain object with properties should return true', is_object({ a: 1, b: 'test' }))
   test('Object created with Object.create should return true', is_object(Object.create({})))
 
+  // pk tests
+  console.log('\nRunning pk tests...\n')
+  const user = { id: 7, name: 'Ada', active: true }
+  const pickId = pk(user, 'id')
+  test('pk picks single key', pickId.id === 7)
+
+  const pickTwo = pk(user, 'id', 'name')
+  test('pk picks multiple keys', pickTwo.id === 7 && pickTwo.name === 'Ada')
+
+  type UserOpt = { id: number; name?: string }
+  const userOpt: UserOpt = { id: 1 }
+  const pickOptional = pk(userOpt, 'name')
+  test('pk returns undefined for missing optional key', pickOptional.name === undefined)
+
+  const pickFromUndefined = pk<UserOpt, 'id' | 'name'>(undefined, 'id', 'name')
+  test('pk works with undefined source, values undefined', pickFromUndefined.id === undefined && pickFromUndefined.name === undefined)
+
   console.log(`\nTest Results: ${passed} passed, ${failed} failed`)
   
   if (failed === 0) {
@@ -67,4 +84,5 @@ export function runTests() {
 if (typeof require !== 'undefined' && require.main === module) {
   runTests()
 }
+
 
