@@ -18,7 +18,7 @@ const filterit = makeFilter();
  
 const timing = 'set TIMING=1&';
 //const timing = '';
-const cmd = timing + 'npx --prefix ./tools/eslint eslint . --debug --config ./tools/eslint/eslint_config.mjs --color';
+const cmd = timing + 'npx eslint . --debug  --color';
 
 const child = spawn(cmd, { shell: true });
 
