@@ -62,3 +62,11 @@ export type strset = Set<string>
 export type s2num = Record<string, number>
 export type s2s = Record<string, string>
 export type num2num = Record<number, number>
+
+export function pk<T, K extends keyof T>(obj: T | undefined, ...keys: K[]): Pick<T, K> {
+  const ret: Record<PropertyKey,unknown> = {} 
+  keys.forEach((key) => {
+    ret[key] = obj?.[key]
+  })
+  return ret as Pick<T, K> 
+}
