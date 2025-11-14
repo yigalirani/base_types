@@ -121,3 +121,61 @@ export async function run_tests(...tests: Test[]) {
   else
     console.log(`\nSummary:  ${failed} failed, ${passed} passed`)  
 }
+
+
+export function getCommonPrefix(paths: string[]): string {
+  if (paths.length === 0) return "";
+  if (paths.length === 1) return paths[0];
+
+  // Split each path into parts (e.g., by "/" or "\\")
+  const splitPaths = paths.map(p => p.split(/[\\/]+/));
+
+  const commonParts: string[] = [];
+  const first = splitPaths[0];
+
+  for (let i = 0; i < first.length; i++) {
+    const part = first[i];
+    if (splitPaths.every(p => p[i] === part)) {
+      commonParts.push(part);
+    } else {
+      break;
+    }
+  }
+
+  // Join back with "/" (or use path.join for platform-specific behavior)
+  return commonParts.join("/");
+}
+
+
+async function get_node(){
+  if (typeof window !== "undefined") {
+    throw new Error("getFileContents() requires Node.js");
+  }
+  const path = await import("node:path");
+  const fs = await import("node:fs/promises");
+  return {fs,path}  
+}
+export async function mkdir_write_file(filePath:string,data:string){
+  const {path,fs}=await get_node()
+  const directory=path.dirname(filePath);
+  try{
+    await fs.mkdir(directory,{recursive:true});
+    await fs.writeFile(filePath,data);
+    console.log(`File '${filePath}' has been written successfully.`);
+  } catch (err){
+    console.error('Error writing file',err)
+  }
+}
+export async function read_json_object(filename:string,object_type:string){
+  const {fs}=await get_node()
+  try{
+    const data=await fs.readFile(filename, "utf-8");
+    const ans=JSON.parse(data) as unknown
+    if (!is_object(ans))
+      throw `not a valid ${object_type}`
+    return ans
+  }catch(ex:unknown){
+    console.warn(`${filename}:${get_error(ex)}.message`)
+    return undefined
+  }
+}

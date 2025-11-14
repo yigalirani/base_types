@@ -29,4 +29,7 @@ export interface Test {
     f: () => MaybePromise<Atom>;
 }
 export declare function run_tests(...tests: Test[]): Promise<void>;
+export declare function getCommonPrefix(paths: string[]): string;
+export declare function mkdir_write_file(filePath: string, data: string): Promise<void>;
+export declare function read_json_object(filename: string, object_type: string): Promise<s2u | undefined>;
 export {};
