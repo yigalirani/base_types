@@ -25,6 +25,10 @@ __export(test_exports, {
 module.exports = __toCommonJS(test_exports);
 
 // src/index.ts
+var green = "\x1B[40m\x1B[32m";
+var red = "\x1B[40m\x1B[31m";
+var yellow = "\x1B[40m\x1B[33m";
+var reset = "\x1B[0m";
 function is_object(value) {
   if (value == null) return false;
   if (typeof value !== "object" && typeof value !== "function") return false;
@@ -39,6 +43,44 @@ function pk(obj, ...keys) {
     ret[key] = obj == null ? void 0 : obj[key];
   });
   return ret;
+}
+function is_promise(value) {
+  if (!is_object(value))
+    return false;
+  const ans = typeof value.then === "function";
+  return ans;
+}
+async function resolve_maybe_promise(a) {
+  if (is_promise(a))
+    return await a;
+  return a;
+}
+async function run_tests(...tests) {
+  let passed = 0;
+  let failed = 0;
+  for (const { k, v, f } of tests) {
+    try {
+      const ret = f();
+      const effective_v = v != null ? v : true;
+      const resolved = await resolve_maybe_promise(ret);
+      if (resolved === effective_v) {
+        console.log(`\u2705 ${k}: ${green}${effective_v}${reset}`);
+        passed++;
+      } else {
+        console.error(`\u274C ${k}:expected ${yellow}${effective_v}${reset}, got ${red}${resolved}${reset}`);
+        failed++;
+      }
+    } catch (err) {
+      console.error(`\u{1F4A5} ${k} threw an error:`, err);
+      failed++;
+    }
+  }
+  if (failed === 0)
+    console.log(`
+Summary:  all ${passed} passed`);
+  else
+    console.log(`
+Summary:  ${failed} failed, ${passed} passed`);
 }
 
 // src/test.ts
@@ -58,59 +100,50 @@ function createSimplePromise(shouldSucceed) {
     }, 1e3);
   });
 }
-function runTests() {
-  let passed = 0;
-  let failed = 0;
-  function test(name, condition) {
-    if (condition) {
-      console.log(`\u2705 ${name}`);
-      passed++;
-    } else {
-      console.log(`\u274C ${name}`);
-      failed++;
-    }
-  }
-  console.log("Running is_object tests...\n");
-  test("class instance should return true", is_object(new Hello()));
-  test("Set should return false", !is_object(/* @__PURE__ */ new Set()));
-  test("Function should return true", is_object(() => {
-  }));
-  test("Array should return false", !is_object([1, 2, 3]));
-  test("Number atom should return false", !is_object(42));
-  test("String atom should return false", !is_object("hello"));
-  test("Boolean atom should return false", !is_object(true));
-  test("null should return false", !is_object(null));
-  test("undefined should return false", !is_object(void 0));
-  test("Date should return true", is_object(/* @__PURE__ */ new Date()));
-  test("RegExp should return true", is_object(/test/));
-  test("Map should return false", !is_object(/* @__PURE__ */ new Map()));
-  test("Promise should return True", is_object(createSimplePromise(true)));
-  test("Plain object should return true", is_object({}));
-  test("Plain object with properties should return true", is_object({ a: 1, b: "test" }));
-  test("Object created with Object.create should return true", is_object(/* @__PURE__ */ Object.create({})));
-  console.log("\nRunning pk tests...\n");
-  const user = { id: 7, name: "Ada", active: true };
-  const pickId = pk(user, "id");
-  test("pk picks single key", pickId.id === 7);
-  const pickTwo = pk(user, "id", "name");
-  test("pk picks multiple keys", pickTwo.id === 7 && pickTwo.name === "Ada");
-  const userOpt = { id: 1 };
-  const pickOptional = pk(userOpt, "name");
-  test("pk returns undefined for missing optional key", pickOptional.name === void 0);
-  const pickFromUndefined = pk(void 0, "id", "name");
-  test("pk works with undefined source, values undefined", pickFromUndefined.id === void 0 && pickFromUndefined.name === void 0);
-  console.log(`
-Test Results: ${passed} passed, ${failed} failed`);
-  if (failed === 0) {
-    console.log("\u{1F389} All tests passed!");
-    return true;
-  } else {
-    console.log("\u{1F4A5} Some tests failed!");
-    return false;
-  }
+async function runTests() {
+  const tests = [
+    { k: "class instance", f: () => is_object(new Hello()) },
+    { k: "Set", v: false, f: () => is_object(/* @__PURE__ */ new Set()) },
+    { k: "Function", f: () => is_object(() => {
+    }) },
+    { k: "Array", v: false, f: () => is_object([1, 2, 3]) },
+    { k: "Number atom", v: false, f: () => is_object(42) },
+    { k: "String atom", v: false, f: () => is_object("hello") },
+    { k: "Boolean atom", f: () => !is_object(true) },
+    { k: "null", v: false, f: () => is_object(null) },
+    { k: "undefined", v: false, f: () => is_object(void 0) },
+    { k: "Date", f: () => is_object(/* @__PURE__ */ new Date()) },
+    { k: "RegExp", f: () => is_object(/test/) },
+    { k: "Map", v: false, f: () => is_object(/* @__PURE__ */ new Map()) },
+    { k: "Promise", f: () => is_object(createSimplePromise(true)) },
+    // Test cases that should return true
+    { k: "Plain object", f: () => is_object({}) },
+    { k: "Plain object with properties", f: () => is_object({ a: 1, b: "test" }) },
+    { k: "Object created with Object.create", f: () => is_object(/* @__PURE__ */ Object.create({})) },
+    { k: "pk picks single key", f: () => {
+      const user = { id: 7, name: "Ada", active: true };
+      const pickId = pk(user, "id");
+      return pickId.id === 7;
+    } },
+    { k: "pk picks multiple keys", f: () => {
+      const user = { id: 7, name: "Ada", active: true };
+      const pickTwo = pk(user, "id", "name");
+      return pickTwo.id === 7 && pickTwo.name === "Ada";
+    } },
+    { k: "pk returns undefined for missing optional key", f: () => {
+      const userOpt = { id: 1 };
+      const pickOptional = pk(userOpt, "name");
+      return pickOptional.name === void 0;
+    } },
+    { k: "pk works with undefined source, values undefined", f: () => {
+      const pickFromUndefined = pk(void 0, "id", "name");
+      return pickFromUndefined.id === void 0 && pickFromUndefined.name === void 0;
+    } }
+  ];
+  await run_tests(...tests);
 }
 if (typeof require !== "undefined" && require.main === module) {
-  runTests();
+  void runTests();
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

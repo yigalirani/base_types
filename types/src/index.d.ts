@@ -1,6 +1,10 @@
 export type s2t<T> = Record<string, T>;
 export type s2u = Record<string, unknown>;
 export type p2u = Record<PropertyKey, unknown>;
+export declare const green = "\u001B[40m\u001B[32m";
+export declare const red = "\u001B[40m\u001B[31m";
+export declare const yellow = "\u001B[40m\u001B[33m";
+export declare const reset = "\u001B[0m";
 export declare function nl<T>(value: T | null | undefined): T;
 export type Key = number | string;
 export type Atom = number | string | boolean;
@@ -17,3 +21,12 @@ export type s2num = Record<string, number>;
 export type s2s = Record<string, string>;
 export type num2num = Record<number, number>;
 export declare function pk<T, K extends keyof T>(obj: T | undefined, ...keys: K[]): Pick<T, K>;
+export declare function is_promise<T = void>(value: unknown): value is Promise<T>;
+type MaybePromise<T> = T | Promise<T>;
+export interface Test {
+    k: string;
+    v?: Atom;
+    f: () => MaybePromise<Atom>;
+}
+export declare function run_tests(...tests: Test[]): Promise<void>;
+export {};

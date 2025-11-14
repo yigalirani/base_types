@@ -1,31 +1,31 @@
 {
   "name": "@yigal/base_types",
-  "version": "1.1.1",
-  "main": "src/index.ts",
-  "types": "types/src/index.d.ts",
-  "scripts": {
-  "watch_build": "node --watch-path=./src build.mjs",
-    "test": "node dist/test.js",
-    "watch_tsc": "tsc --build --watch",
-    "run_biome": "biome lint",
-    "run_eslint": "node ./run_eslint.mjs"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "2.2.2",
-    "globals": "^16.3.0",
-    "typescript": "^5.0.0",
-    "@eslint/css": "^0.10.0",
-    "@eslint/js": "^9.34.0",
-    "@types/node": "^24.0.14",
-    "eslint": "^9.34.0",
-    "eslint-formatter-visualstudio": "^8.40.0",
-    "typescript-eslint": "^8.36.0",
-    "eslint-import-resolver-typescript": "^4.4.4",
-    "eslint-plugin-import-x": "^4.16.1",
-    "esbuild": "^0.25.8"    
-  },
+  "version": "1.2.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/yigalirani/base_types.git"
-  } 
+  },
+  "main": "src/index.ts",
+  "types": "types/src/index.d.ts",
+  "scripts": {
+    "run_biome": "biome lint",
+    "run_eslint": "node ./run_eslint.mjs",
+    "test": "node --watch-path=./dist/test.js dist/test.js",
+    "watch_build": "node --watch-path=./src build.ts",
+    "watch_tsc": "tsc --build --watch"
+  },
+  "devDependencies": {
+    "@biomejs/biome"                    : "2.3.4",
+    "@eslint/css"                       : "0.14.1",
+    "@eslint/js"                        : "9.39.1",
+    "@types/node"                       : "24.10.0",
+    "esbuild"                           : "0.25.12",
+    "eslint"                            : "9.39.1",
+    "eslint-formatter-visualstudio"     : "9.0.1",
+    "eslint-import-resolver-typescript" : "4.4.4",
+    "eslint-plugin-import-x"            : "4.16.1",
+    "globals"                           : "16.5.0",
+    "typescript"                        : "5.9.3",
+    "typescript-eslint"                 : "8.46.3"
+  }
 }

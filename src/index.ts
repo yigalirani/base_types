@@ -1,6 +1,11 @@
 export type s2t<T> = Record<string, T>
 export type s2u = Record<string, unknown>
 export type p2u = Record<PropertyKey, unknown> 
+export const green='\x1b[40m\x1b[32m'
+export const red='\x1b[40m\x1b[31m'
+export const yellow='\x1b[40m\x1b[33m'
+
+export const reset='\x1b[0m'
 export function nl<T>(value: T | null | undefined): T {
   //todo:check only active on debug mode
   //return value
@@ -69,4 +74,50 @@ export function pk<T, K extends keyof T>(obj: T | undefined, ...keys: K[]): Pick
     ret[key] = obj?.[key]
   })
   return ret as Pick<T, K> 
+}
+export function is_promise<T=void>(value: unknown): value is Promise<T> { ///ts(2677)
+  if (!is_object(value))
+    return false
+
+  const ans=typeof (value.then)==='function'
+  return ans
+}
+type MaybePromise<T>=T|Promise<T>
+async function resolve_maybe_promise<T>(a:MaybePromise<T>){
+  if (is_promise(a))
+    return await a
+  return a
+}
+      
+export interface Test{
+  k:string,
+  v?:Atom,
+  f:()=>MaybePromise<Atom>
+}
+
+export async function run_tests(...tests: Test[]) {
+  let passed = 0
+  let failed = 0
+
+  for (const {k,v,f} of tests) {
+    try {
+      const ret=f()
+      const effective_v=v??true
+      const resolved = await resolve_maybe_promise(ret)
+      if (resolved===effective_v){
+        console.log(`✅ ${k}: ${green}${effective_v}${reset}`)
+        passed++
+      } else {
+        console.error(`❌ ${k}:expected ${yellow}${effective_v}${reset}, got ${red}${resolved}${reset}`)
+        failed++
+      }
+    } catch (err) {
+      console.error(`💥 ${k} threw an error:`, err)
+      failed++
+    }
+  }
+  if (failed===0)
+    console.log(`\nSummary:  all ${passed} passed`)  
+  else
+    console.log(`\nSummary:  ${failed} failed, ${passed} passed`)  
 }
