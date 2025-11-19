@@ -90,7 +90,7 @@ async function resolve_maybe_promise<T>(a:MaybePromise<T>){
 }
       
 export interface Test{
-  k:string,
+  k?:string,
   v?:Atom,
   f:()=>MaybePromise<Atom>
 }
@@ -98,21 +98,30 @@ export interface Test{
 export async function run_tests(...tests: Test[]) {
   let passed = 0
   let failed = 0
-
+  
   for (const {k,v,f} of tests) {
+    const ek=function(){
+      if (k!=null)
+        return k
+      const fstr=String(f)
+      const match=fstr.match(/(\(\) => )(.*)/)
+      if (match?.length===3)
+        return match[2]
+      return
+    }()
     try {
       const ret=f()
       const effective_v=v??true
       const resolved = await resolve_maybe_promise(ret)
       if (resolved===effective_v){
-        console.log(`✅ ${k}: ${green}${effective_v}${reset}`)
+        console.log(`✅ ${ek}: ${green}${effective_v}${reset}`)
         passed++
       } else {
-        console.error(`❌ ${k}:expected ${yellow}${effective_v}${reset}, got ${red}${resolved}${reset}`)
+        console.error(`❌ ${ek}:expected ${yellow}${effective_v}${reset}, got ${red}${resolved}${reset}`)
         failed++
       }
     } catch (err) {
-      console.error(`💥 ${k} threw an error:`, err)
+      console.error(`💥 ${ek} threw an error:`, err)
       failed++
     }
   }
@@ -178,4 +187,12 @@ export async function read_json_object(filename:string,object_type:string){
     console.warn(`${filename}:${get_error(ex)}.message`)
     return undefined
   }
+}
+export function is_string_array(a:unknown):a is string[]{
+  if (!Array.isArray(a))
+    return false
+  for (const x of a)
+    if (typeof x!=='string')
+      return false
+  return true  
 }

@@ -1,4 +1,4 @@
-import { is_object, pk,run_tests,type Test } from './index'
+import { is_object, pk,run_tests,type Test,is_string_array } from './index'
 class Hello{
   constructor(){
     console.log('making Hello')
@@ -55,7 +55,13 @@ export async function runTests() {
   {k:'pk works with undefined source, values undefined',f:()=>{
     const pickFromUndefined = pk<UserOpt, 'id' | 'name'>(undefined, 'id', 'name')    
     return pickFromUndefined.id === undefined && pickFromUndefined.name === undefined
-  }}
+  }},
+  {v:false,f:()=>is_string_array(null)},
+  {v:false,f:()=>is_string_array({})},
+  {v:true,f:()=>is_string_array([])},
+  {v:true,f:()=>is_string_array(['hello'])},
+  {v:true,f:()=>is_string_array(['hello','1'])},
+  {v:false,f:()=>is_string_array(['hello',1])},  
   ]
   await run_tests(...tests)
 }

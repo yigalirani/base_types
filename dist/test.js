@@ -59,19 +59,28 @@ async function run_tests(...tests) {
   let passed = 0;
   let failed = 0;
   for (const { k, v, f } of tests) {
+    const ek = (function() {
+      if (k != null)
+        return k;
+      const fstr = String(f);
+      const match = fstr.match(/(\(\) => )(.*)/);
+      if ((match == null ? void 0 : match.length) === 3)
+        return match[2];
+      return;
+    })();
     try {
       const ret = f();
       const effective_v = v != null ? v : true;
       const resolved = await resolve_maybe_promise(ret);
       if (resolved === effective_v) {
-        console.log(`\u2705 ${k}: ${green}${effective_v}${reset}`);
+        console.log(`\u2705 ${ek}: ${green}${effective_v}${reset}`);
         passed++;
       } else {
-        console.error(`\u274C ${k}:expected ${yellow}${effective_v}${reset}, got ${red}${resolved}${reset}`);
+        console.error(`\u274C ${ek}:expected ${yellow}${effective_v}${reset}, got ${red}${resolved}${reset}`);
         failed++;
       }
     } catch (err) {
-      console.error(`\u{1F4A5} ${k} threw an error:`, err);
+      console.error(`\u{1F4A5} ${ek} threw an error:`, err);
       failed++;
     }
   }
@@ -81,6 +90,14 @@ Summary:  all ${passed} passed`);
   else
     console.log(`
 Summary:  ${failed} failed, ${passed} passed`);
+}
+function is_string_array(a) {
+  if (!Array.isArray(a))
+    return false;
+  for (const x of a)
+    if (typeof x !== "string")
+      return false;
+  return true;
 }
 
 // src/test.ts
@@ -138,7 +155,13 @@ async function runTests() {
     { k: "pk works with undefined source, values undefined", f: () => {
       const pickFromUndefined = pk(void 0, "id", "name");
       return pickFromUndefined.id === void 0 && pickFromUndefined.name === void 0;
-    } }
+    } },
+    { v: false, f: () => is_string_array(null) },
+    { v: false, f: () => is_string_array({}) },
+    { v: true, f: () => is_string_array([]) },
+    { v: true, f: () => is_string_array(["hello"]) },
+    { v: true, f: () => is_string_array(["hello", "1"]) },
+    { v: false, f: () => is_string_array(["hello", 1]) }
   ];
   await run_tests(...tests);
 }
