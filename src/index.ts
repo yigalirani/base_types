@@ -104,9 +104,16 @@ export async function run_tests(...tests: Test[]) {
       if (k!=null)
         return k
       const fstr=String(f)
-      const match=fstr.match(/(\(\) => )(.*)/)
-      if (match?.length===3)
-        return match[2]
+      {
+        const match=fstr.match(/(\(\) => )(.*)/)
+        if (match?.length===3)
+          return match[2]
+      }
+      {
+        const match=fstr.match(/function\s(\w+)/)
+        if (match?.length===2)
+          return match[1]      
+      }
       return
     }()
     try {
@@ -195,4 +202,10 @@ export function is_string_array(a:unknown):a is string[]{
     if (typeof x!=='string')
       return false
   return true  
+}
+
+export async function sleep(ms: number) {
+  return await new Promise((resolve) => {
+    setTimeout(() => resolve(undefined), ms);
+  });
 }

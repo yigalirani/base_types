@@ -63,9 +63,16 @@ async function run_tests(...tests) {
       if (k != null)
         return k;
       const fstr = String(f);
-      const match = fstr.match(/(\(\) => )(.*)/);
-      if ((match == null ? void 0 : match.length) === 3)
-        return match[2];
+      {
+        const match = fstr.match(/(\(\) => )(.*)/);
+        if ((match == null ? void 0 : match.length) === 3)
+          return match[2];
+      }
+      {
+        const match = fstr.match(/function\s(\w+)/);
+        if ((match == null ? void 0 : match.length) === 2)
+          return match[1];
+      }
       return;
     })();
     try {
@@ -99,6 +106,11 @@ function is_string_array(a) {
       return false;
   return true;
 }
+async function sleep(ms) {
+  return await new Promise((resolve) => {
+    setTimeout(() => resolve(void 0), ms);
+  });
+}
 
 // src/test.ts
 var Hello = class {
@@ -116,6 +128,15 @@ function createSimplePromise(shouldSucceed) {
       }
     }, 1e3);
   });
+}
+async function testSleep() {
+  console.log("Test started...");
+  const start = Date.now();
+  await sleep(1e3);
+  const end = Date.now();
+  console.log(`Slept for ${end - start} ms`);
+  console.log("Test finished.");
+  return Math.abs(end - start - 1e3) < 100;
 }
 async function runTests() {
   const tests = [
@@ -161,7 +182,8 @@ async function runTests() {
     { v: true, f: () => is_string_array([]) },
     { v: true, f: () => is_string_array(["hello"]) },
     { v: true, f: () => is_string_array(["hello", "1"]) },
-    { v: false, f: () => is_string_array(["hello", 1]) }
+    { v: false, f: () => is_string_array(["hello", 1]) },
+    { v: true, f: testSleep }
   ];
   await run_tests(...tests);
 }

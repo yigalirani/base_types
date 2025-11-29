@@ -33,4 +33,5 @@ export declare function getCommonPrefix(paths: string[]): string;
 export declare function mkdir_write_file(filePath: string, data: string): Promise<void>;
 export declare function read_json_object(filename: string, object_type: string): Promise<s2u | undefined>;
 export declare function is_string_array(a: unknown): a is string[];
+export declare function sleep(ms: number): Promise<unknown>;
 export {};

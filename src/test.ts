@@ -1,4 +1,4 @@
-import { is_object, pk,run_tests,type Test,is_string_array } from './index'
+import { is_object, pk,run_tests,type Test,is_string_array,sleep } from './index'
 class Hello{
   constructor(){
     console.log('making Hello')
@@ -18,6 +18,18 @@ function createSimplePromise(shouldSucceed: boolean): Promise<string> {
 }  
 type UserOpt = { id: number; name?: string }
 // Test function to run all tests
+async function testSleep() {
+  console.log("Test started...");
+
+  const start = Date.now();
+  await sleep(1000); // sleep for 1 second
+  const end = Date.now();
+
+  console.log(`Slept for ${end - start} ms`);
+  console.log("Test finished.");
+  return Math.abs(end-start-1000)<100
+}
+
 export async function runTests() {
   const tests:Test[]=[
   {k:'class instance',f:()=> is_object(new Hello())},
@@ -61,7 +73,8 @@ export async function runTests() {
   {v:true,f:()=>is_string_array([])},
   {v:true,f:()=>is_string_array(['hello'])},
   {v:true,f:()=>is_string_array(['hello','1'])},
-  {v:false,f:()=>is_string_array(['hello',1])},  
+  {v:false,f:()=>is_string_array(['hello',1])},
+  {v:true,f:testSleep}  
   ]
   await run_tests(...tests)
 }
