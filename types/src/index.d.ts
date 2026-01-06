@@ -22,7 +22,8 @@ export type s2s = Record<string, string>;
 export type num2num = Record<number, number>;
 export declare function pk<T, K extends keyof T>(obj: T | undefined, ...keys: K[]): Pick<T, K>;
 export declare function is_promise<T = void>(value: unknown): value is Promise<T>;
-type MaybePromise<T> = T | Promise<T>;
+export type MaybePromise<T> = T | Promise<T>;
+export declare function resolve_maybe_promise<T>(a: MaybePromise<T>): Promise<T>;
 export interface Test {
     k?: string;
     v?: Atom;
@@ -34,4 +35,8 @@ export declare function mkdir_write_file(filePath: string, data: string): Promis
 export declare function read_json_object(filename: string, object_type: string): Promise<s2u | undefined>;
 export declare function is_string_array(a: unknown): a is string[];
 export declare function sleep(ms: number): Promise<unknown>;
-export {};
+export declare function default_get<T>(obj: Record<PropertyKey, T>, k: PropertyKey, maker: () => T): T;
+export declare class Repeater {
+    is_running: boolean;
+    repeat(f: () => MaybePromise<void>): Promise<void>;
+}
