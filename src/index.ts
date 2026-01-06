@@ -82,8 +82,8 @@ export function is_promise<T=void>(value: unknown): value is Promise<T> { ///ts(
   const ans=typeof (value.then)==='function'
   return ans
 }
-type MaybePromise<T>=T|Promise<T>
-async function resolve_maybe_promise<T>(a:MaybePromise<T>){
+export type MaybePromise<T>=T|Promise<T>
+export async function resolve_maybe_promise<T>(a:MaybePromise<T>){
   if (is_promise(a))
     return await a
   return a
@@ -208,4 +208,27 @@ export async function sleep(ms: number) {
   return await new Promise((resolve) => {
     setTimeout(() => resolve(undefined), ms);
   });
+}
+export function default_get<T>(obj:Record<PropertyKey,T>,k:PropertyKey,maker:()=>T){
+  const exists=obj[k]
+  if (exists==null){
+    obj[k]=maker()
+  }
+  return obj[k]
+}
+export class Repeater{
+  is_running:boolean=true
+  async repeat(f:()=>MaybePromise<void>){
+    while (this.is_running) {
+      try {
+        const result = await f();
+        console.log(result);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+
+      // wait before next run
+      await new Promise(resolve => setTimeout(resolve, 2000));
+    }
+  }
 }
